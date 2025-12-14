@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { fetchPlayers, fetchGames } from "@/lib/sheets";
+import { fetchPlayers, fetchGames, buildGoogleDriveImageUrl, buildGoogleDriveThumbnailUrl } from "@/lib/sheets";
 import PlayerRadar from "@/components/PlayerRadar";
 
 export default function PlayerPageClient() {
@@ -17,6 +17,8 @@ export default function PlayerPageClient() {
   const [loading, setLoading] = useState(true);
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
+
+  const getFoto = (p) => (p?.FOTO || p?.Foto || p?.foto || "").trim();
 
   useEffect(() => {
     if (!playerId) return;
@@ -141,6 +143,45 @@ export default function PlayerPageClient() {
         ← Volver al ranking
       </Link>
 
+      {(() => {
+        const foto = getFoto(player);
+        const fotoSrc =
+          buildGoogleDriveImageUrl(foto) || buildGoogleDriveThumbnailUrl(foto);
+        if (!fotoSrc) return null;
+        return (
+          <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+            <div
+              style={{
+                width: 128,
+                height: 128,
+                borderRadius: "50%",
+                overflow: "hidden",
+                backgroundColor: "#f3f4f6",
+                margin: "0 auto",
+              }}
+            >
+              <img
+                src={fotoSrc}
+                alt={name ? `Foto de ${name}` : "Foto"}
+                width={128}
+                height={128}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const thumb = buildGoogleDriveThumbnailUrl(foto);
+                  if (thumb && e.currentTarget.src !== thumb) {
+                    e.currentTarget.src = thumb;
+                    return;
+                  }
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
+          </div>
+        );
+      })()}
+
       <h2>{name}</h2>
 
       <div className="player-info">
@@ -196,7 +237,7 @@ export default function PlayerPageClient() {
       </div>
 
       <section style={{ marginTop: 24, textAlign: "center" }}>
-        <h3>Estadísticas</h3>
+        <h3>Características</h3>
         <PlayerRadar player={player} />
       </section>
 
@@ -206,7 +247,7 @@ export default function PlayerPageClient() {
           <p>Sin resultados registrados para este jugador (o configurar `GAMES_SHEET_GID`).</p>
         ) : (
           <div className="games-table" style={{ overflowX: "auto" }}>
-            <table style={{ fontSize: "0.85rem" }}>
+            <table style={{ fontSize: "0.70rem" }}>
               <thead>
                 <tr>
                   <th>Fecha</th>

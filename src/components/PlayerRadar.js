@@ -13,14 +13,16 @@ export default function PlayerRadar({ player }) {
   ];
 
   return (
-    <div style={{ width: 150, height: 150, display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data}>
-          <PolarGrid />
-          <PolarAngleAxis dataKey="stat" />
-          <Radar name="Stats" dataKey="value" stroke="#667eea" fill="#667eea" fillOpacity={0.6} />
-        </RadarChart>
-      </ResponsiveContainer>
+    <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+      <div style={{ width: 200, height: 200 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart data={data}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="stat" />
+            <Radar name="Stats" dataKey="value" stroke="#667eea" fill="#667eea" fillOpacity={0.6} />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
